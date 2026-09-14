@@ -67,12 +67,20 @@ nav{
   border-bottom:3px solid var(--paper);
   font-family:var(--mono);
 }
-.logo{ font-weight:700; letter-spacing:.02em; font-size:15px; }
+.logo{
+  font-weight:700; letter-spacing:.02em; font-size:15px;
+  background:var(--ink-2); border:2px solid var(--paper);
+  box-shadow:3px 3px 0 var(--paper);
+  padding:8px 14px;
+}
 .logo span{ background:var(--amber); color:var(--ink); padding:0 4px; font-weight:700; }
-.navlinks{ display:flex; gap:28px; font-size:13px; color:var(--paper-dim); }
-.navlinks a{ transition:color .15s var(--ease); padding:6px 2px; }
-.navlinks a:hover{ color:var(--amber); }
-.navlinks a.active{ color:var(--teal); font-weight:700; }
+.navlinks{ display:flex; gap:10px; font-size:13px; color:var(--paper-dim); }
+.navlinks a{
+  padding:8px 12px; border:2px solid transparent;
+  transition:color .15s var(--ease), background .15s var(--ease), border-color .15s var(--ease);
+}
+.navlinks a:hover{ background:var(--amber); border-color:var(--amber); color:var(--ink); }
+.navlinks a.active{ background:var(--teal); border-color:var(--teal); color:var(--ink); font-weight:700; }
 .navlinks a.active::before{ content:'▸ '; }
 
 .nav-toggle{
