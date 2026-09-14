@@ -150,10 +150,18 @@ if(window.matchMedia('(prefers-reduced-motion: reduce)').matches){
 const skillRows = document.querySelectorAll('.skill-row');
 const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
+function skillLabel(percent){
+  if(percent >= 60) return 'Cukup Kuat';
+  if(percent >= 40) return 'Berkembang';
+  return 'Baru Mulai';
+}
+
 function fillSkill(row){
   const target = parseInt(row.dataset.percent, 10) || 0;
   const fill = row.querySelector('.skill-fill');
   const pctLabel = row.querySelector('.skill-pct');
+  const tag = row.querySelector('.skill-tag');
+  if(tag) tag.textContent = skillLabel(target);
   row.classList.add('filled');
 
   if(reduceMotion){
@@ -197,7 +205,7 @@ const caseDetails = {
     title: 'Ucapan Ulang Tahun Interaktif',
     body: [
       'Website ucapan ulang tahun personal, dibuat sebagai latihan front-end murni tanpa framework berat.',
-      'Fokus latihan: animasi CSS, transisi antar momen/scene, dan layout responsif — langkah awal sebelum masuk ke proyek yang lebih kompleks.',
+      'Fokus latihan: animasi CSS, transisi antar momen/scene, dan layout responsif. Langkah awal sebelum masuk ke proyek yang lebih kompleks.',
       'Stack: HTML, CSS, JavaScript vanilla.'
     ]
   },
@@ -231,10 +239,10 @@ const caseDetails = {
   '05': {
     title: 'd1xxy OPTIMIZE',
     body: [
-      'Aplikasi desktop berbasis PyQt6 untuk melakukan tuning performa Windows 11 — dikerjakan sebagai side project di luar kuliah, jalan paralel dengan proyek-proyek lain.',
-      'Menyediakan 60+ tweak lintas kategori: power, CPU, RAM, storage, cleanup, sampai gaming — masing-masing dengan penjelasan risiko dan tombol undo, jadi tweak yang diterapkan tetap bisa dibatalkan.',
+      'Aplikasi desktop berbasis PyQt6 untuk melakukan tuning performa Windows 11, dikerjakan sebagai side project di luar kuliah yang jalan paralel dengan proyek lain.',
+      'Menyediakan 60+ tweak lintas kategori: power, CPU, RAM, storage, cleanup, sampai gaming. Masing-masing dengan penjelasan risiko dan tombol undo, jadi tweak yang diterapkan tetap bisa dibatalkan.',
       'Ada dashboard real-time yang memantau CPU load, RAM usage, disk speed, dan network speed, lengkap dengan rekomendasi otomatis (prioritas High/Med/Low) berdasarkan kondisi sistem.',
-      'Fitur AI Assistant bawaan ("D1XXY Neural Net") bisa menjawab pertanyaan seputar kondisi hardware dan menyarankan optimisasi sesuai kebutuhan, misalnya untuk gaming atau mengurangi pemakaian RAM.',
+      'Ada asisten AI bawaan yang bisa jawab pertanyaan seputar kondisi hardware dan kasih saran tweak sesuai kebutuhan, misalnya buat gaming atau biar RAM nggak kepakai banyak.',
       '<strong>Stack:</strong> Python, PyQt6, sequential tweak executor dengan pre-flight check, dry-run, dan audit log.'
     ]
   }
@@ -297,3 +305,124 @@ document.addEventListener('keydown', (e)=>{
     }
   }
 });
+
+// ---------- Scroll progress bar + back-to-top button ----------
+const progressFill = document.getElementById('scroll-progress-fill');
+const toTopBtn = document.getElementById('to-top');
+
+function updateScrollUI(){
+  const scrollTop = window.scrollY;
+  const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+  const progress = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
+
+  if(progressFill) progressFill.style.width = progress + '%';
+  if(toTopBtn) toTopBtn.classList.toggle('visible', scrollTop > window.innerHeight * 0.6);
+}
+
+window.addEventListener('scroll', updateScrollUI, { passive: true });
+updateScrollUI();
+
+if(toTopBtn){
+  toTopBtn.addEventListener('click', ()=>{
+    window.scrollTo({ top: 0, behavior: reduceMotionGlobal ? 'auto' : 'smooth' });
+  });
+}
+
+// ---------- Eyebrow typewriter (each "$ command" types itself in) ----------
+const eyebrows = document.querySelectorAll('.eyebrow');
+
+function typeEyebrow(el){
+  const text = el.textContent;
+  el.textContent = '';
+  el.classList.add('typing');
+  const cursor = document.createElement('span');
+  cursor.className = 'cursor eyebrow-cursor';
+  el.appendChild(cursor);
+
+  let i = 0;
+  const step = ()=>{
+    if(i < text.length){
+      cursor.insertAdjacentText('beforebegin', text[i]);
+      i++;
+      setTimeout(step, 28);
+    } else {
+      cursor.remove();
+      el.classList.remove('typing');
+    }
+  };
+  step();
+}
+
+if(eyebrows.length){
+  if(reduceMotionGlobal || !('IntersectionObserver' in window)){
+    // leave static text as-is
+  } else {
+    const eyebrowObserver = new IntersectionObserver((entries)=>{
+      entries.forEach(entry=>{
+        if(!entry.isIntersecting) return;
+        typeEyebrow(entry.target);
+        eyebrowObserver.unobserve(entry.target);
+      });
+    }, { threshold: 0.6 });
+    eyebrows.forEach(el => eyebrowObserver.observe(el));
+  }
+}
+
+// ---------- Stat number count-up ----------
+const countTargets = document.querySelectorAll('[data-count-to]');
+
+if(countTargets.length){
+  const countUp = (el)=>{
+    const target = parseInt(el.dataset.countTo, 10) || 0;
+    if(reduceMotionGlobal){ el.textContent = target; return; }
+    const duration = 700;
+    const start = performance.now();
+    const step = (now)=>{
+      const progress = Math.min((now - start) / duration, 1);
+      el.textContent = Math.round(progress * target);
+      if(progress < 1) requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
+  };
+
+  if('IntersectionObserver' in window){
+    const countObserver = new IntersectionObserver((entries)=>{
+      entries.forEach(entry=>{
+        if(!entry.isIntersecting) return;
+        countUp(entry.target);
+        countObserver.unobserve(entry.target);
+      });
+    }, { threshold: 0.6 });
+    countTargets.forEach(el => countObserver.observe(el));
+  } else {
+    countTargets.forEach(countUp);
+  }
+}
+
+// ---------- Case card tilt (pointer devices only) ----------
+const tiltEnabled = window.matchMedia('(hover: hover) and (pointer: fine)').matches && !reduceMotionGlobal;
+
+if(tiltEnabled){
+  document.querySelectorAll('.case').forEach(card=>{
+    let frame = null;
+
+    card.addEventListener('mousemove', (e)=>{
+      const rect = card.getBoundingClientRect();
+      const px = (e.clientX - rect.left) / rect.width - 0.5;
+      const py = (e.clientY - rect.top) / rect.height - 0.5;
+
+      if(frame) cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(()=>{
+        card.style.transition = 'none';
+        card.style.transform = `perspective(900px) translateY(-3px) rotateX(${(-py * 3.5).toFixed(2)}deg) rotateY(${(px * 3.5).toFixed(2)}deg)`;
+      });
+    });
+
+    card.addEventListener('mouseleave', ()=>{
+      if(frame) cancelAnimationFrame(frame);
+      card.style.transition = 'transform .4s var(--ease)';
+      card.style.transform = '';
+      setTimeout(()=>{ card.style.transition = ''; }, 420);
+    });
+  });
+}
