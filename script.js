@@ -74,7 +74,7 @@ if(navToggle && navLinks){
 // ---------- Hero terminal typing effect ----------
 const lines = [
   { prompt: '$', text: 'whoami' },
-  { plain: '→ Dicky belajar Full Stack Web Development (Laravel) dari dasar, sambil ngulik security' },
+  { plain: '→ Dicky belajar Full Stack Web Development dari dasar, salah satunya Laravel, sambil ngulik security' },
   { prompt: '$', text: 'cat status.txt' },
   { plain: '→ Masih tahap belajar, dibangun pelan-pelan lewat proyek nyata' },
   { prompt: '$', text: 'ls proyek/' },
@@ -399,7 +399,66 @@ if(countTargets.length){
   }
 }
 
-// ---------- Case card tilt (pointer devices only) ----------
+// ---------- Theme toggle (light/dark, remembered per browser) ----------
+const themeToggle = document.getElementById('theme-toggle');
+const themeIcon = document.getElementById('theme-toggle-icon');
+const themeColorMeta = document.querySelector('meta[name="theme-color"]');
+const THEME_KEY = 'dicky-portfolio-theme';
+
+function applyTheme(theme){
+  document.documentElement.setAttribute('data-theme', theme);
+  if(themeIcon) themeIcon.textContent = theme === 'light' ? '☾' : '☀';
+  if(themeToggle) themeToggle.setAttribute('aria-pressed', String(theme === 'light'));
+  if(themeColorMeta) themeColorMeta.setAttribute('content', theme === 'light' ? '#f3ede1' : '#0a0d11');
+}
+
+function getStoredTheme(){
+  try{ return localStorage.getItem(THEME_KEY); }catch(e){ return null; }
+}
+
+function storeTheme(theme){
+  try{ localStorage.setItem(THEME_KEY, theme); }catch(e){ /* ignore, e.g. private mode */ }
+}
+
+const savedTheme = getStoredTheme();
+const systemPrefersLight = window.matchMedia('(prefers-color-scheme: light)').matches;
+applyTheme(savedTheme || (systemPrefersLight ? 'light' : 'dark'));
+
+if(themeToggle){
+  themeToggle.addEventListener('click', ()=>{
+    const next = document.documentElement.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+    applyTheme(next);
+    storeTheme(next);
+  });
+}
+
+// ---------- Easter egg: squash the bug (bug bounty, literally) ----------
+const crawlBug = document.getElementById('crawl-bug');
+let bugsSquashed = 0;
+
+if(crawlBug){
+  crawlBug.addEventListener('click', ()=>{
+    if(crawlBug.classList.contains('squashed')) return;
+    bugsSquashed++;
+    crawlBug.classList.add('squashed');
+
+    const rect = crawlBug.getBoundingClientRect();
+    const popup = document.createElement('div');
+    popup.className = 'bounty-popup';
+    popup.textContent = `bounty +1 (${bugsSquashed})`;
+    popup.style.left = rect.left + 'px';
+    popup.style.top = (rect.top - 6) + 'px';
+    document.body.appendChild(popup);
+    setTimeout(()=> popup.remove(), 1000);
+
+    setTimeout(()=>{
+      crawlBug.classList.remove('squashed');
+      crawlBug.style.animation = 'none';
+      void crawlBug.offsetWidth; // force reflow so the crawl animation restarts cleanly
+      crawlBug.style.animation = '';
+    }, 1300);
+  });
+}
 const tiltEnabled = window.matchMedia('(hover: hover) and (pointer: fine)').matches && !reduceMotionGlobal;
 
 if(tiltEnabled){
