@@ -202,7 +202,7 @@ nav{
 .hero{
   min-height:100vh;
   display:flex; flex-direction:column; justify-content:center;
-  padding:0 6vw;
+  padding:130px 6vw 60px;
   position:relative;
 }
 .term{
@@ -270,7 +270,7 @@ nav{
 }
 
 /* ---------- section shell ---------- */
-section{ padding:110px 6vw; position:relative; z-index:2; scroll-margin-top:90px; border-top:3px solid var(--line); }
+section{ padding:110px 6vw; position:relative; z-index:2; scroll-margin-top:110px; border-top:3px solid var(--line); }
 .hero{ border-top:none; }
 .eyebrow{
   font-family:var(--mono); font-size:12px; color:var(--amber-text); font-weight:700;
