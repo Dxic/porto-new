@@ -78,7 +78,7 @@ const lines = [
   { prompt: '$', text: 'cat status.txt' },
   { plain: '→ Masih tahap belajar, dibangun pelan-pelan lewat proyek nyata' },
   { prompt: '$', text: 'ls proyek/' },
-  { plain: '→ ucapan-ultah.html  chatnexus-v2/  data-penduduk-app/  webgis-umkm/' },
+  { plain: '→ ucapan-ultah.html  chatnexus-v2/  data-penduduk-app/  webgis-umkm/  d1xxy-optimize/' },
 ];
 
 const body = document.getElementById('term-body');
